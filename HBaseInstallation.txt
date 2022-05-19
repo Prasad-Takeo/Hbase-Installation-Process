@@ -1,0 +1,98 @@
+Install Hbase
+Similarly, we can install HBase in any of the three modes: Standalone mode, Pseudo-Distributed mode, and Fully Distributed mode. We will install HBase in Pseudo-Distributed mode here.
+
+Go to the Apache website http://www.apache.org/dyn/closer.cgi/hbase/ again to check for the most recent version of HBase. And download it into this folder /usr/local/HBase/.
+
+$ wget http://apache.mirror.gtcomm.net/hbase/stable/hbase-1.2.5-bin.tar.gz
+$ tar -zxvf hbase-1.2.5-bin.tar.gz 
+$ sudo mv hbase-1.2.5 /usr/local/HBase/
+Add these to .profile:
+
+export HBASE_HOME=/usr/local/Hbase
+export PATH=$PATH:$HBASE_HOME/bin
+And follow by:
+
+source ~/.profile
+Edit JAVA_HOME in shell script hbase-env.sh under folder /usr/local/Hbase/conf/:
+
+# The java implementation to use.  Java 1.7+ required.
+export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64
+HBase Configurations
+All the configuration files are under this folder /usr/local/Hbase/conf/.
+
+hbase-site.xml
+
+<configuration>
+   <property>
+      <name>hbase.rootdir</name>
+      <value>hdfs://localhost:8030/hbase</value>
+   </property>
+	
+   <property>
+      <name>hbase.zookeeper.property.dataDir</name>
+      <value>/home/hadoop/zookeeper</value>
+   </property>
+   
+   <property>
+     <name>hbase.cluster.distributed</name>
+     <value>true</value>
+   </property>
+</configuration>
+Finally, before we start HBase, we have to make sure that Hadoop is running. We can use jps to check the running processes. And we can then start HBase with the following.
+
+$ /usr/local/HBase/bin/start-hbase.sh 
+localhost: starting zookeeper, logging to /usr/local/Hbase/bin/../logs/hbase-yzhong_cs-zookeeper-instance-2.out
+starting master, logging to /usr/local/Hbase/bin/../logs/hbase-yzhong_cs-master-instance-2.out
+OpenJDK 64-Bit Server VM warning: ignoring option PermSize=128m; support was removed in 8.0
+OpenJDK 64-Bit Server VM warning: ignoring option MaxPermSize=128m; support was removed in 8.0
+starting regionserver, logging to /usr/local/Hbase/bin/../logs/hbase-yzhong_cs-1-regionserver-instance-2.out
+Entering HBase shell:
+
+root@instance-2:/home/yzhong_cs# hbase shell
+SLF4J: Class path contains multiple SLF4J bindings.
+SLF4J: Found binding in [jar:file:/usr/local/Hbase/lib/slf4j-log4j12-1.7.5.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/usr/local/hadoop/share/hadoop/common/lib/slf4j-log4j12-1.7.10.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
+HBase Shell; enter 'help<RETURN>' for list of supported commands.
+Type "exit<RETURN>" to leave the HBase Shell
+Version 1.2.5, rd7b05f79dee10e0ada614765bb354b93d615a157, Wed Mar  1 00:34:48 CST 2017
+hbase(main):001:0>
+
+All-in-one logs:
+
+Start HDFS
+Start YARN
+Start HBase
+root@instance-2:/home/yzhong_cs# start-dfs.sh
+startyStarting namenodes on [localhost]
+localhost: starting namenode, logging to /usr/local/hadoop/logs/hadoop-root-namenode-instance-2.out
+-yarn.shlocalhost: starting datanode, logging to /usr/local/hadoop/logs/hadoop-root-datanode-instance-2.out
+Starting secondary namenodes [0.0.0.0]
+0.0.0.0: starting secondarynamenode, logging to /usr/local/hadoop/logs/hadoop-root-secondarynamenode-instance-2.out
+root@instance-2:/home/yzhong_cs# start-yarn.sh
+starting yarn daemons
+starting resourcemanager, logging to /usr/local/hadoop/logs/yarn-root-resourcemanager-instance-2.out
+localhost: starting nodemanager, logging to /usr/local/hadoop/logs/yarn-root-nodemanager-instance-2.out
+root@instance-2:/home/yzhong_cs# start-hbase.sh
+localhost: starting zookeeper, logging to /usr/local/Hbase/bin/../logs/hbase-root-zookeeper-instance-2.out
+starting master, logging to /usr/local/Hbase/logs/hbase-root-master-instance-2.out
+OpenJDK 64-Bit Server VM warning: ignoring option PermSize=128m; support was removed in 8.0
+OpenJDK 64-Bit Server VM warning: ignoring option MaxPermSize=128m; support was removed in 8.0
+starting regionserver, logging to /usr/local/Hbase/logs/hbase-root-1-regionserver-instance-2.out
+HBase creates its directory in HDFS. To see the created directory, browse to Hadoop bin and type the following command.
+
+root@instance-2:/home/yzhong_cs# hadoop fs -ls /hbase
+Found 7 items
+drwxr-xr-x   - root supergroup          0 2017-05-15 02:03 /hbase/.tmp
+drwxr-xr-x   - root supergroup          0 2017-05-15 02:03 /hbase/MasterProcWALs
+drwxr-xr-x   - root supergroup          0 2017-05-15 02:02 /hbase/WALs
+drwxr-xr-x   - root supergroup          0 2017-05-15 02:03 /hbase/data
+-rw-r--r--   1 root supergroup         42 2017-05-15 02:02 /hbase/hbase.id
+-rw-r--r--   1 root supergroup          7 2017-05-15 02:02 /hbase/hbase.version
+drwxr-xr-x   - root supergroup          0 2017-05-15 02:02 /hbase/oldWALs
+That’s all about installing HBase. We will check the Hadoop dashboard with the following URLs:
+
+Again, don’t forget to replace 123.456.78.90 with your VM’s IP address.
+
+http://123.456.78.90:16010/master-status
